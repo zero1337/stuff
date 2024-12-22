@@ -1,0 +1,135 @@
+To set up the XFCE desktop environment in Termux on your Android device, follow these steps:
+
+    Update and Install Necessary Packages:
+
+pkg update
+pkg upgrade
+pkg install x11-repo
+pkg install xfce4 tigervnc
+
+This updates your package lists, upgrades installed packages, and installs the XFCE desktop environment along with the TigerVNC server.
+
+Configure the VNC Server:
+
+    Initialize the VNC server to set up a password:
+
+vncserver -localhost
+
+You'll be prompted to create a password (up to 8 characters) and optionally a view-only password.
+
+Stop the VNC server to configure the startup script:
+
+vncserver -kill :1
+
+This stops the VNC server that was just started.
+
+Edit the ~/.vnc/xstartup file to start the XFCE session:
+
+    echo "#!/data/data/com.termux/files/usr/bin/sh
+    xfce4-session &" > ~/.vnc/xstartup
+    chmod +x ~/.vnc/xstartup
+
+    This sets up the VNC server to launch the XFCE desktop environment.
+
+Start the VNC Server:
+
+vncserver -localhost
+
+This starts the VNC server on display :1, which corresponds to port 5901.
+
+Connect to the VNC Server:
+
+    Install a VNC viewer app on your Android device, such as VNC Viewer by RealVNC.
+
+    Open the VNC viewer app and create a new connection with the following details:
+        Address: 127.0.0.1:5901
+        Name: Termux XFCE
+
+    Connect to the VNC server using the password you set earlier.
+
+Stop the VNC Server When Done: After you're finished with your session, you can stop the VNC server to free up system resources:
+
+    vncserver -kill :1
+
+For more detailed information and additional configuration options, refer to the Termux Wiki on Graphical Environment.
+
+Note: Running a full desktop environment like XFCE in Termux can be resource-intensive and may not provide the same performance as on a traditional Linux system.
+
+
+-----------------------------------------------------------------
+
+set custom resolution:
+
+Defining a custom resolution in XFCE involves using the **xrandr** tool to set the desired resolution. Here’s a step-by-step guide:
+
+---
+
+### Step 1: Identify your display name
+1. Open a terminal.
+2. Run the following command:
+   ```bash
+   xrandr
+   ```
+   Look for the name of your display (e.g., `HDMI-1`, `DP-1`, `eDP-1`, etc.).
+
+---
+
+### Step 2: Calculate the modeline
+1. Use the `cvt` command to generate a modeline for your desired resolution. For example, to create a 1920x1080 resolution:
+   ```bash
+   cvt 1920 1080
+   ```
+2. The output will look something like this:
+   ```
+   # 1920x1080 60.00 Hz (CVT) hsync: 67.50 kHz; pclk: 173.00 MHz
+   Modeline "1920x1080_60.00"  173.00  1920 2048 2248 2576  1080 1083 1088 1120 -hsync +vsync
+   ```
+
+---
+
+### Step 3: Add the new resolution
+1. Copy the `Modeline` part (e.g., `"1920x1080_60.00"` and its parameters).
+2. Add the new mode with the following command:
+   ```bash
+   xrandr --newmode "1920x1080_60.00" 173.00 1920 2048 2248 2576 1080 1083 1088 1120 -hsync +vsync
+   ```
+3. Associate this mode with your display. For example, if your display is `HDMI-1`:
+   ```bash
+   xrandr --addmode HDMI-1 "1920x1080_60.00"
+   ```
+
+---
+
+### Step 4: Apply the resolution
+1. Set the resolution using the following command:
+   ```bash
+   xrandr --output HDMI-1 --mode "1920x1080_60.00"
+   ```
+
+---
+
+### Step 5: Make it persistent
+The above commands only apply for the current session. To make them persistent across reboots, you need to add the commands to your startup configuration.
+
+1. Create or edit a startup script:
+   ```bash
+   nano ~/.xprofile
+   ```
+2. Add the following lines:
+   ```bash
+   xrandr --newmode "1920x1080_60.00" 173.00 1920 2048 2248 2576 1080 1083 1088 1120 -hsync +vsync
+   xrandr --addmode HDMI-1 "1920x1080_60.00"
+   xrandr --output HDMI-1 --mode "1920x1080_60.00"
+   ```
+3. Save the file and exit.
+
+---
+
+### Step 6: Reboot and test
+Reboot your system, and the custom resolution should be applied automatically.
+
+
+___
+
+install firefox 
+pkg install firefox
